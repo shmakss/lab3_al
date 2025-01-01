@@ -128,7 +128,21 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="CheckInput.cpp" />
+    <ClCompile Include="CompressorComplex.cpp" />
+    <ClCompile Include="CompressorStation.cpp" />
+    <ClCompile Include="Input.cpp" />
     <ClCompile Include="my_project.cpp" />
+    <ClCompile Include="Pipe.cpp" />
+    <ClCompile Include="Pipeline.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="CheckInput.h" />
+    <ClInclude Include="CompressorComplex.h" />
+    <ClInclude Include="CompressorStation.h" />
+    <ClInclude Include="Input.h" />
+    <ClInclude Include="Pipe.h" />
+    <ClInclude Include="Pipeline.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
