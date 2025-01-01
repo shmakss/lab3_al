@@ -16,6 +16,7 @@ public:
 	void changeUnderRepair(std::vector <int> ids);
 	void save(std::ofstream& out);
 	bool write(std::ifstream& in);
+	//К сожалению, вы получите копию элемента
 	Pipe getElement(int id);
 	bool deleteElement(int id);
 	bool find(Pipe pipe, std::string value);
@@ -32,4 +33,8 @@ public:
 	}
 	std::string showElement(int id);
 	void clear();
+	int size();
+	bool count(int id);
+	std::vector<int> findDiameterForNetwork(int diameter);
+	void getAJob(int id, int idInput, int idOutput);
 };

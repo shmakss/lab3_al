@@ -45,18 +45,15 @@ CheckInput check;
 Pipe pipe;
 Pipeline pipeline;
 
-CompressorStation cs;
-CompressorComplex cc;
-
-std::istream& operator >> (std::istream& in, Pipe& pipe) {
-    std::string name = check.checkInputString("Введите название трубы\n",input,error);;
-    int length = check.checkInputInt("Введите длину трубы в километрах\n", true,input, error);;
+istream& operator >> (std::istream& in, Pipe& pipe) {
+    std::string name = check.checkInputString("Введите название трубы\n", input, error);;
+    int length = check.checkInputInt("Введите длину трубы в километрах\n", true, input, error);;
     int diameter = check.checkInputInt("Введите диаметр трубы в милиметрах\n", true, input, error);;
     bool underRepair = false;
     bool flag = false;
     do {
         flag = false;
-        int temp = check.checkInputInt("По умолчанию труба не находится в ремонте\nВведите 1, если хотите изменить этот параметр, иначе - 0\n", false,input,error);
+        int temp = check.checkInputInt("По умолчанию труба не находится в ремонте\nВведите 1, если хотите изменить этот параметр, иначе - 0\n", false, input, error);
         if (temp == 1) {
             underRepair = true;
         }
@@ -70,7 +67,7 @@ std::istream& operator >> (std::istream& in, Pipe& pipe) {
     pipe.setUnderRepair(underRepair);
     return in;
 }
-std::ostream& operator << (std::ostream& os, Pipe& pipe) {
+ostream& operator << (std::ostream& os, Pipe& pipe) {
     return os << pipe.showPipe();
 }
 
@@ -84,6 +81,8 @@ istream& operator >> (istream& in, Pipeline& pipeline) {
     return in;
 }
 
+CompressorStation cs;
+CompressorComplex cc;
 
 istream& operator >> (istream& in, CompressorStation& cs) {
     string name = check.checkInputString("Введите название компрессорной станции\n",input,error);
@@ -173,7 +172,7 @@ template <typename T>
 vector<int> makeWork(T t, vector <int> chest) {
     cout << "\n\nНАЙДЕННЫЕ ЭЛЕМЕНТЫ\n";
     for (int id : chest) {
-        cout << "Элемент с идентификатором " << id << endl << t.get().showElement(id) << endl;
+        cout << t.get().showElement(id) << endl;
     }
     bool flag = check.getOnly01("Что вы хотите сделать с элементами этого списка?\n0 - удалить\n1 - редактировать\n",input,error);
     if (!flag) {
@@ -224,11 +223,12 @@ public:
                     "\n5.Найти компрессорную станцию (поиск позволяет также редактировать элементы)" +
                     "\n6.Сохранить" +
                     "\n7.Загрузить" +
-                    "\n8.Проиграть сценарий" +
-                    "\n9.Удалить все данные" +
+                    "\n8.Дополнить газотранспортную сеть" +
+                    "\n9.Проиграть сценарий" +
+                    "\n10.Удалить все данные" +
                     "\n0.Выход\n", false,input,error);
 
-                if (choice > 9) {
+                if (choice > 10) {
                     flag = true;
                 }
             } while (flag);
@@ -272,7 +272,6 @@ public:
                 }
                 break;
             }
-
             case (7): {
                 string name_file = check.checkInputString("Введите имя файла для сохранения\n",input,error);
                 if (!end_with(name_file, ".txt")) {
@@ -299,10 +298,41 @@ public:
                 }
                 break;
             }
-            case (8):
+            case (8): {
+                if (cc.size() < 2) {
+                    cout << "Для газотранспортной сети недостаточно компрессорных станций\n";
+                    break;
+                }
+                if (check.getOnly01("Вывести доступные элементы компрессорного комплекса?\n0 - нет\n1 - да\n", input, error)) {
+                    cout << cc;
+                }
+                int idInput = check.checkInputInt("Введите индентификатор КС-входа\n", false, input, error);
+                int idOutput = check.checkInputInt("Введите индентификатор КС-выхода\n", false, input, error);
+                if (cc.count(idInput) and cc.count(idOutput)) {
+                    int diameter;
+                    do {
+                        diameter = check.checkInputInt("Введите диаметр трубы\n(500,700,1000 или 1400 мм)\n", false, input, error);
+                    } while (diameter != 500 and diameter != 700 and diameter != 1000 and diameter != 1400);
+                    int pipeId = pipeline.findDiameterForNetwork(diameter);
+                    if (pipeId > 0) {
+                        pipeline.getAJob(pipeId, idInput, idOutput);
+                        cout << pipeline.getElement(pipeId).isInWork() << endl;
+                        cin.get();
+                    }
+                    else {
+
+                    }
+
+                }
+                else {
+                    cout << "Ошибка в введённом индентификаторе\n";
+                }
+                break;
+            }
+            case (9):
                 input.make_file_as_cin(error);
                 break;
-            case (9):
+            case (10):
                 pipeline.clear();
                 cc.clear();
                 cout << "Готово!\n";

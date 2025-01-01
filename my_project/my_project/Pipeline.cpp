@@ -9,8 +9,7 @@ std::string Pipeline::showPipeline() {
 	std::string output = "ТРУБОПРОВОД:\n";
 
 	for (auto& [id, pipe] : pipeline) {
-		int i = id + 8;
-		output += pipe.showPipe();
+		output += "Элемент с идентификатором " + std::to_string(id) + "\n" + pipe.showPipe();
 
 	}
 	if (pipeline.size() == 0) {
@@ -77,6 +76,7 @@ bool Pipeline::write(std::ifstream& in) {
 	}
 	return true;
 }
+//К сожалению, вы получите копию элемента
 Pipe Pipeline::getElement(int id) {
 	if (pipeline.count(id)) {
 		return pipeline[id];
@@ -112,13 +112,38 @@ bool Pipeline::editElement(int id, Input& input, std::ofstream& error) {
 }
 std::string Pipeline::showElement(int id) {
 	if (pipeline.count(id)) {
-		return pipeline[id].showPipe();
+		return "Элемент с идентификатором " + std::to_string(id) + "\n" + pipeline[id].showPipe();
 	}
 	else {
 		return "";
 	}
 }
+bool Pipeline::count(int id) {
+	int count = 0;
+	for (auto& element : pipeline) {
+		if (element.first == id) {
+			return true;
+		}
+	}
+	return false;
+}
+std::vector<int> Pipeline::findDiameterForNetwork(int diameter)
+{
+	std::vector<int> ids;
+	for (auto& [id,pipe] : pipeline) {
+		if (!pipe.isInWork() and pipe.getDiameter() == diameter) {
+			ids.push_back(id);
+		}
+	}
+	return ids;
+}
+void Pipeline::getAJob(int id, int idInput, int idOutput)
+{
+	pipeline[id].getAJob(idInput,idOutput);
+}
 void Pipeline::clear() {
 	pipeline.clear();
 }
-
+int Pipeline::size() {
+	return pipeline.size();
+}

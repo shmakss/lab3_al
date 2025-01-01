@@ -5,7 +5,7 @@ void CompressorComplex::setCompressorComplex(CompressorStation cs) {
 }
 std::string CompressorComplex::showElement(int id) {
 	if (compressorComplex.count(id)) {
-		return compressorComplex[id].showCompressorStation();
+		return "Элемент с идентификатором " + std::to_string(id) + "\n" + compressorComplex[id].showCompressorStation();
 	}
 	else {
 		return "";
@@ -14,7 +14,7 @@ std::string CompressorComplex::showElement(int id) {
 std::string CompressorComplex::showCompressorComplex() {
 	std::string output = "КОМПРЕССОРНЫЙ КОМПЛЕКС:\n";
 	for (auto& [id, cs] : compressorComplex) {
-		output += cs.showCompressorStation();
+		output += "Элемент с идентификатором " + std::to_string(id) + "\n" + cs.showCompressorStation();
 
 	}
 	if (compressorComplex.size() == 0) {
@@ -106,7 +106,19 @@ bool CompressorComplex::find(CompressorStation cs, int value) {
 		return false;
 	}
 }
-
 void CompressorComplex::clear() {
 	compressorComplex.clear();
+}
+bool CompressorComplex::count(int id)
+{
+	int count = 0;
+	for (auto& element : compressorComplex) {
+		if (element.first == id) {
+			return true;
+		}
+	}
+	return false;
+}
+int CompressorComplex::size() {
+	return compressorComplex.size();
 }

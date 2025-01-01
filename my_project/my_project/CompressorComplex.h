@@ -29,5 +29,7 @@ public:
         }
         return ids;
     }
+    int size();
     void clear();
+    bool count(int id);
 };

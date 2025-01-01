@@ -95,3 +95,10 @@ bool CheckInput::getOnly01(std::string text, Input& input, std::ofstream& error)
 	} while (flag != 0 and flag != 1);
 	return bool(flag);
 }
+int CheckInput::makeInputFromVector(std::string text, bool checkZero, Input& input, std::ofstream& error, std::vector<int> nums) {
+	int num;
+	do {
+		num = checkInputInt(text, checkZero, input, error);
+	} while (!bool(std::count(nums.begin(), nums.end(), num)));
+	return num;
+}

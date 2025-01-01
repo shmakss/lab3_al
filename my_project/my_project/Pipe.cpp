@@ -84,3 +84,22 @@ bool Pipe::write(std::ifstream& in) {
 		return false;
 	}
 }
+
+bool Pipe::isInWork()
+{
+	return inWork;
+}
+
+void Pipe::getAJob(int idInput,int idOutput)
+{
+	inWork = true;
+	this->idInput = idInput;
+	this->idOutput = idOutput;
+}
+
+void Pipe::dismiss()
+{
+	inWork = false;
+	idInput = -1;
+	idOutput = -1;
+}
