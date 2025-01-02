@@ -311,12 +311,15 @@ public:
                 if (cc.count(idInput) and cc.count(idOutput)) {
                     int diameter;
                     do {
-                        diameter = check.checkInputInt("Введите диаметр трубы\n(500,700,1000 или 1400 мм)\n", false, input, error);
+                        diameter = check.checkInputInt("Введите диаметр трубы (500,700,1000 или 1400 мм)\n", false, input, error);
                     } while (diameter != 500 and diameter != 700 and diameter != 1000 and diameter != 1400);
-                    int pipeId = pipeline.findDiameterForNetwork(diameter);
-                    if (pipeId > 0) {
+                    vector<int> pipeIds = pipeline.findDiameterForNetwork(diameter);
+                    if (pipeIds.size() > 0) {
+                        cout << "Вам подходят следующие трубы:\n";
+                        for (int i : pipeIds) {
+                            cout << pipeline.showElement(i);
+                        }
                         pipeline.getAJob(pipeId, idInput, idOutput);
-                        cout << pipeline.getElement(pipeId).isInWork() << endl;
                         cin.get();
                     }
                     else {
