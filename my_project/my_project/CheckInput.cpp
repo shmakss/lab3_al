@@ -1,6 +1,34 @@
 #include "CheckInput.h"
 
-int CheckInput::checkInputInt(std::string text, bool checkZero, Input& input, std::ofstream& error) {
+std::string CheckInput::getDate() {
+	auto time = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+	std::string t = ctime(&time);
+	std::string result;
+	bool flag = false;
+	for (char i : t) {
+		if ((i == ':' or i == ' ') and !flag) {
+			result += ' ';
+			flag = true;
+		}
+		else {
+			if (flag and i != ' ' or !flag) {
+				result += i;
+			}
+			flag = false;
+		}
+	}
+
+	result.pop_back();
+	return result;
+}
+
+
+CheckInput::CheckInput()
+{
+	std::string file_name = std::string("all_scripts/") + std::string(getDate()) + std::string(".txt");
+	error.open(file_name);
+}
+int CheckInput::checkInputInt(std::string text, bool checkZero) {
 	int result;
 	bool flag = false;
 	//мы будем крутить цикл до тех пор, пока пользователь не введёт число
@@ -15,10 +43,16 @@ int CheckInput::checkInputInt(std::string text, bool checkZero, Input& input, st
 			std::cin.seekg(std::cin.eof());
 		}
 		std::getline(std::cin, temp);
-		if (!input.getFileIsCin()) {
+		/*if (!input.getFileIsCin()) {
+			error << temp << std::endl;
+			error.flush();
+		}*/
+		//Разбить в случае опасности
+		if (!input.getFileIsCin() and temp != "9") {
 			error << temp << std::endl;
 			error.flush();
 		}
+		//-----------------------
 		if (temp == "") {
 			flag = true;
 		}
@@ -59,7 +93,7 @@ bool CheckInput::isInputInt(std::string num, bool checkZero) {
 	return flag;
 
 }
-std::string CheckInput::checkInputString(std::string text, Input& input, std::ofstream& error) {
+std::string CheckInput::checkInputString(std::string text) {
 	bool flag = false;
 	do {
 		if (input.getFileIsCin() and std::cin.eof()) {
@@ -88,17 +122,26 @@ std::string CheckInput::checkInputString(std::string text, Input& input, std::of
 
 	} while (flag);
 }
-bool CheckInput::getOnly01(std::string text, Input& input, std::ofstream& error) {
+bool CheckInput::getOnly01(std::string text) {
 	int flag;
 	do {
-		flag = checkInputInt(text, false, input, error);
+		flag = checkInputInt(text, false);
 	} while (flag != 0 and flag != 1);
 	return bool(flag);
 }
-int CheckInput::makeInputFromVector(std::string text, bool checkZero, Input& input, std::ofstream& error, std::vector<int> nums) {
+int CheckInput::makeInputFromVector(std::string text, bool checkZero, std::vector<int> nums) {
 	int num;
 	do {
-		num = checkInputInt(text, checkZero, input, error);
+		num = checkInputInt(text, checkZero);
 	} while (!bool(std::count(nums.begin(), nums.end(), num)));
 	return num;
+}
+void CheckInput::changeCin()
+{
+	input.make_file_as_cin(error);
+}
+void CheckInput::endWork()
+{
+	input.close_brush();
+	error.close();
 }

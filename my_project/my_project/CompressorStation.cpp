@@ -1,6 +1,7 @@
 #include "CompressorStation.h"
 
-CompressorStation::CompressorStation() {
+CompressorStation::CompressorStation(CheckInput& check){
+	this->check = &check;
 	id += 1;
 }
 void CompressorStation::setName(std::string name) {
@@ -15,7 +16,9 @@ void CompressorStation::setWorkingWorkshops(int workingWorkshops) {
 void CompressorStation::setEffectiveness(int effectiveness) {
 	this->effectiveness = effectiveness;
 }
-
+void CompressorStation::setPipes(std::vector<int> pipes) {
+	this->pipes = pipes;
+}
 std::string CompressorStation::getName() {
 	return name;
 }
@@ -28,10 +31,13 @@ int CompressorStation::getWorkingWorkshops() {
 int CompressorStation::getEffectiveness() {
 	return effectiveness;
 }
+std::vector<int> CompressorStation::getPipes()
+{
+	return pipes;
+}
 int CompressorStation::getId() {
 	return id;
 }
-
 std::string CompressorStation::showCompressorStation() {
 	return "Имя: " + name +
 		"\nКоличество цехов: " + std::to_string(workshops) +
@@ -43,8 +49,8 @@ std::string CompressorStation::showWorkshops() {
 		"Общее количество цехов:\n" + std::to_string(workshops) +
 		"\nЧисло цехов, которые находятся в работе:\n" + std::to_string(workingWorkshops) + "\n";
 }
-void CompressorStation::changeWorkingWorkshops(Input& input,std::ofstream& error) {
-	bool option = bool(check.getOnly01("0 - остановить цех\n1 - запустить цех\n", input, error));
+void CompressorStation::changeWorkingWorkshops() {
+	bool option = bool(check->getOnly01("0 - остановить цех\n1 - запустить цех\n"));
 	if (option) {
 		if (startWorkshop()) {
 			std::cout << showWorkshops();
@@ -98,9 +104,9 @@ bool CompressorStation::write(std::ifstream& in) {
 	}
 	if (flag
 		and (parameters[0] != "")
-		and check.isInputInt(parameters[1], false)
-		and check.isInputInt(parameters[2], false)
-		and check.isInputInt(parameters[3], false)
+		and check->isInputInt(parameters[1], false)
+		and check->isInputInt(parameters[2], false)
+		and check->isInputInt(parameters[3], false)
 		and workingWorkshops <= workshops) {
 		name = parameters[0];
 		workshops = stoi(parameters[1]);
@@ -112,4 +118,36 @@ bool CompressorStation::write(std::ifstream& in) {
 	{
 		return false;
 	}
+}
+CheckInput& CompressorStation::getCheckInput()
+{
+	return *check;
+}
+std::istream& operator >> (std::istream& in, CompressorStation& cs) {
+	CheckInput& check(cs.getCheckInput());
+	std::string name = check.checkInputString("Введите название компрессорной станции\n");
+	int workshops = check.checkInputInt("Введите количество цехов\n", false);
+	int workingWorkshops;
+	bool flag = false;
+	int temp;
+	do {
+		flag = false;
+		temp = check.checkInputInt("Введите количество цехов, которые находятся в работе\n", false);
+		if (temp > workshops) {
+			flag = true;
+		}
+		else {
+			workingWorkshops = temp;
+		}
+	} while (flag);
+	int effectiveness = check.checkInputInt("Введите эффективность\n", false);
+
+	cs.setName(name);
+	cs.setWorkshops(workshops);
+	cs.setWorkingWorkshops(workingWorkshops);
+	cs.setEffectiveness(effectiveness);
+	return in;
+}
+std::ostream& operator << (std::ostream& os, CompressorStation& cs) {
+	return os << cs.showCompressorStation();
 }

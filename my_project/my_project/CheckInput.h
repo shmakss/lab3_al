@@ -4,12 +4,21 @@
 #include "Input.h"
 #include <fstream>
 #include <vector>
+#include <chrono>
+#pragma warning(disable : 4996)
 
 class CheckInput {
+private:
+	Input input;
+	std::ofstream error;
 public:
-	int checkInputInt(std::string text, bool checkZero, Input& input, std::ofstream& error);
+	CheckInput();
+	std::string getDate();
+	int checkInputInt(std::string text, bool checkZero);
 	bool isInputInt(std::string num, bool checkZero);
-	std::string checkInputString(std::string text, Input& input, std::ofstream& error);
-	bool getOnly01(std::string text, Input& input, std::ofstream& error);
-	int makeInputFromVector(std::string text, bool checkZero, Input& input, std::ofstream& error, std::vector<int> nums);
+	std::string checkInputString(std::string text);
+	bool getOnly01(std::string text);
+	int makeInputFromVector(std::string text, bool checkZero, std::vector<int> nums);
+	void changeCin();
+	void endWork();
 };

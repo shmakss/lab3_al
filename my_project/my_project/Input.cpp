@@ -26,8 +26,9 @@ void Input::make_file_as_cin(std::ofstream& error) {
         std::cout << text_choise_script;
         std::cin.seekg(std::cin.eof());
         std::getline(std::cin, flag_choise_script);
-        error << flag_choise_script << "\n";
-        error.flush();
+
+        /*error << flag_choise_script << "\n";
+        error.flush();*/
 
     } while (flag_choise_script != "0" and flag_choise_script != "1");
     if (flag_choise_script == "0") {
@@ -35,8 +36,8 @@ void Input::make_file_as_cin(std::ofstream& error) {
     }
     else {
         std::string file_for_cin = checkInputString("¬ведить название вашего файла (он должен лежать в папке all_scripts)\n");
-        error << file_for_cin;
-        error.flush();
+       /*error << file_for_cin;
+        error.flush();*/
         file_for_cin = "all_scripts/" + file_for_cin;
         script.open(file_for_cin);
         if (!script.is_open()) {
@@ -52,13 +53,21 @@ void Input::make_file_as_cin(std::ofstream& error) {
         std::cout << text_out;
         std::cin.seekg(std::cin.eof());
         std::getline(std::cin, flag);
-        error << flag << "\n";
-        error.flush();
+        /*error << flag << "\n";
+        error.flush();*/
     } while (flag != "0" and flag != "1");
     flag_for_cout = bool(stoi(flag));
 
     if (script.is_open()) {
         file_is_cin = true;
+        //разбить в случае опасности
+        std::string oneLineOfScript;
+        while (std::getline(script, oneLineOfScript)) {
+            error << oneLineOfScript << std::endl;
+        }
+        script.clear();
+        script.seekg(0, std::ios::beg);
+        //--------------------------
         cinbuf = std::cin.rdbuf();
         std::cin.rdbuf(script.rdbuf());
         if (!flag_for_cout) {

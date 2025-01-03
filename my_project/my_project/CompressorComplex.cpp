@@ -1,11 +1,16 @@
 #include "CompressorComplex.h"
 
-void CompressorComplex::setCompressorComplex(CompressorStation cs) {
-	compressorComplex[CompressorStation::getId()] = cs;
+CompressorComplex::CompressorComplex(CheckInput& check)
+{
+	this->check = &check;
+}
+void CompressorComplex::setCompressorComplex(CompressorStation cs)
+{
+	compressorComplex.insert({ CompressorStation::getId(),cs });
 }
 std::string CompressorComplex::showElement(int id) {
 	if (compressorComplex.count(id)) {
-		return "Элемент с идентификатором " + std::to_string(id) + "\n" + compressorComplex[id].showCompressorStation();
+		return "Элемент с идентификатором " + std::to_string(id) + "\n" + compressorComplex.at(id).showCompressorStation();
 	}
 	else {
 		return "";
@@ -22,7 +27,7 @@ std::string CompressorComplex::showCompressorComplex() {
 	}
 	return output;
 }
-void CompressorComplex::changeCompressionStation(Input& input, std::ofstream error) {
+void CompressorComplex::changeCompressionStation() {
 	if (compressorComplex.size() == 0) {
 		std::cout << "Для начала создайте компрессорные станции\n";
 		return;
@@ -33,11 +38,11 @@ void CompressorComplex::changeCompressionStation(Input& input, std::ofstream err
 	}
 	int cs_id;
 	do {
-		cs_id = check.checkInputInt("Какую компрессорную станцию вы хотите радактировать?\n" + all_cs, false, input, error);
+		cs_id = check->checkInputInt("Какую компрессорную станцию вы хотите радактировать?\n" + all_cs, false);
 
 	} while (!compressorComplex.count(cs_id));
 
-	compressorComplex[cs_id].changeWorkingWorkshops(input, error);
+	compressorComplex.at(cs_id).changeWorkingWorkshops();
 }
 void CompressorComplex::save(std::ofstream& out) {
 	out << "s" << compressorComplex.size() << "\n";
@@ -58,21 +63,21 @@ bool CompressorComplex::write(std::ifstream& in) {
 		return false;
 	}
 	getline(in, temp);
-	if (temp == "" or temp[0] != 's' or !check.isInputInt(temp.substr(1, temp.length() - 1), true)) {
+	if (temp == "" or temp[0] != 's' or !check->isInputInt(temp.substr(1, temp.length() - 1), true)) {
 		return false;
 	}
 	int amount = stoi(temp.substr(1, temp.length() - 1));
 	for (int i = 0; i < amount; i++) {
-		CompressorStation new_cs;
+		CompressorStation new_cs(*check);
 		if (new_cs.write(in)) {
-			temp_compressorComplex[CompressorStation::getId()] = new_cs;
+			temp_compressorComplex.insert({ CompressorStation::getId(), new_cs });
 		}
 		else {
 			return false;
 		}
 	}
 	for (auto& [id, cs] : temp_compressorComplex) {
-		compressorComplex[id] = cs;
+		compressorComplex.insert({id,cs});
 	}
 	return true;
 }
@@ -86,19 +91,19 @@ bool CompressorComplex::deleteElement(int id) {
 		return false;
 	}
 }
-bool CompressorComplex::editElement(int id, Input& input, std::ofstream& error) {
+bool CompressorComplex::editElement(int id) {
 	if (compressorComplex.count(id)) {
-		compressorComplex[id].changeWorkingWorkshops(input,error);
+		compressorComplex.at(id).changeWorkingWorkshops();
 		return true;
 	}
 	else {
 		return false;
 	}
 }
-bool CompressorComplex::find(CompressorStation cs, std::string value) {
+bool CompressorComplex::find(CompressorStation& cs, std::string value) {
 	return value == cs.getName();
 }
-bool CompressorComplex::find(CompressorStation cs, int value) {
+bool CompressorComplex::find(CompressorStation& cs, int value) {
 	if (cs.getWorkshops() != 0) {
 		return (int)((double)(cs.getWorkshops() - cs.getWorkingWorkshops()) / cs.getWorkshops() * 100) == value;
 	}
@@ -119,6 +124,19 @@ bool CompressorComplex::count(int id)
 	}
 	return false;
 }
+CheckInput& CompressorComplex::getCheckInput()
+{
+	return *check;
+}
 int CompressorComplex::size() {
 	return compressorComplex.size();
+}
+std::ostream& operator << (std::ostream& os, CompressorComplex& cc) {
+	return os << cc.showCompressorComplex();
+}
+std::istream& operator >> (std::istream& in, CompressorComplex& cc) {
+	CompressorStation cs(cc.getCheckInput());
+	std::cin >> cs;
+	cc.setCompressorComplex(cs);
+	return in;
 }

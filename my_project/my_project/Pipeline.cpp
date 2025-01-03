@@ -1,9 +1,12 @@
 #include "Pipeline.h"
 
-
+Pipeline::Pipeline(CheckInput& check)
+{
+	this->check = &check;
+}
 
 void Pipeline::setPipeline(Pipe pipe) {
-	pipeline[Pipe::getId()] = pipe;
+	pipeline.insert({ Pipe::getId(), pipe});
 }
 std::string Pipeline::showPipeline() {
 	std::string output = "ТРУБОПРОВОД:\n";
@@ -28,16 +31,16 @@ void Pipeline::changeUnderRepair(Input& input, std::ofstream error) {
 	}
 	int pipe_id;
 	do {
-		pipe_id = check.checkInputInt("Какую трубу вы хотите редактировать?\n" + all_pipes, false,input,error);
+		pipe_id = check->checkInputInt("Какую трубу вы хотите редактировать?\n" + all_pipes, false);
 
 	} while (!pipeline.count(pipe_id));
-	pipeline[pipe_id].changeUnderRepair();
-	std::cout << pipeline[pipe_id].showUnderRepair();
+	pipeline.at(pipe_id).changeUnderRepair();
+	std::cout << pipeline.at(pipe_id).showUnderRepair();
 }
 void Pipeline::changeUnderRepair(std::vector <int> ids) {
 	if (ids.size() != 0) {
 		for (int id : ids) {
-			pipeline[id].changeUnderRepair();
+			pipeline.at(id).changeUnderRepair();
 		}
 	}
 }
@@ -58,29 +61,23 @@ bool Pipeline::write(std::ifstream& in) {
 	std::unordered_map<int, Pipe> temp_pipeline;
 	std::string temp;
 	std::getline(in, temp);
-	if (temp == "" or temp[0] != 's' or !check.isInputInt(temp.substr(1, temp.length() - 1), true)) {
+	if (temp == "" or temp[0] != 's' or !check->isInputInt(temp.substr(1, temp.length() - 1), true)) {
 		return false;
 	}
 	int amount = stoi(temp.substr(1, temp.length() - 1));
 	for (int i = 0; i < amount; i++) {
-		Pipe new_pipe;
+		Pipe new_pipe(*check);
 		if (new_pipe.write(in)) {
-			temp_pipeline[Pipe::getId()] = new_pipe;
+			temp_pipeline.insert({ Pipe::getId(),new_pipe });
 		}
 		else {
 			return false;
 		}
 	}
 	for (auto& [id, pipe] : temp_pipeline) {
-		pipeline[id] = pipe;
+		pipeline.insert({ id,pipe });
 	}
 	return true;
-}
-//К сожалению, вы получите копию элемента
-Pipe Pipeline::getElement(int id) {
-	if (pipeline.count(id)) {
-		return pipeline[id];
-	}
 }
 bool Pipeline::deleteElement(int id)
 {
@@ -94,15 +91,15 @@ bool Pipeline::deleteElement(int id)
 	}
 
 }
-bool Pipeline::find(Pipe pipe, std::string value) {
+bool Pipeline::find(Pipe& pipe, std::string value) {
 	return value == pipe.getName();
 }
-bool Pipeline::find(Pipe pipe, bool value) {
+bool Pipeline::find(Pipe& pipe, bool value) {
 	return pipe.getUnderRepair() == value;
 }
-bool Pipeline::editElement(int id, Input& input, std::ofstream& error) {
+bool Pipeline::editElement(int id) {
 	if (pipeline.count(id)) {
-		pipeline[id].changeUnderRepair();
+		pipeline.at(id).changeUnderRepair();
 		std::cout << "Готово!\n";
 		return true;
 	}
@@ -112,7 +109,7 @@ bool Pipeline::editElement(int id, Input& input, std::ofstream& error) {
 }
 std::string Pipeline::showElement(int id) {
 	if (pipeline.count(id)) {
-		return "Элемент с идентификатором " + std::to_string(id) + "\n" + pipeline[id].showPipe();
+		return "Элемент с идентификатором " + std::to_string(id) + "\n" + pipeline.at(id).showPipe();
 	}
 	else {
 		return "";
@@ -137,13 +134,22 @@ std::vector<int> Pipeline::findDiameterForNetwork(int diameter)
 	}
 	return ids;
 }
-void Pipeline::getAJob(int id, int idInput, int idOutput)
+CheckInput& Pipeline::getCheckInput()
 {
-	pipeline[id].getAJob(idInput,idOutput);
+	return *check;
 }
 void Pipeline::clear() {
 	pipeline.clear();
 }
 int Pipeline::size() {
 	return pipeline.size();
+}
+std::ostream& operator << (std::ostream& os, Pipeline& pipeline) {
+	return os << pipeline.showPipeline();
+}
+std::istream& operator >> (std::istream& in, Pipeline& pipeline) {
+	Pipe newPipe(pipeline.getCheckInput());
+	std::cin >> newPipe;
+	pipeline.setPipeline(newPipe);
+	return in;
 }
