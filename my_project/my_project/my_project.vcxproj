@@ -132,6 +132,7 @@
     <ClCompile Include="CompressorComplex.cpp" />
     <ClCompile Include="CompressorStation.cpp" />
     <ClCompile Include="GasTransmissionNetwork.cpp" />
+    <ClCompile Include="Graph.cpp" />
     <ClCompile Include="Input.cpp" />
     <ClCompile Include="my_project.cpp" />
     <ClCompile Include="Pipe.cpp" />
@@ -142,6 +143,7 @@
     <ClInclude Include="CompressorComplex.h" />
     <ClInclude Include="CompressorStation.h" />
     <ClInclude Include="GasTransmissionNetwork.h" />
+    <ClInclude Include="Graph.h" />
     <ClInclude Include="Input.h" />
     <ClInclude Include="Pipe.h" />
     <ClInclude Include="Pipeline.h" />

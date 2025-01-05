@@ -26,7 +26,6 @@ public:
     void setInWork(bool inWork);
     void setIdInput(int idInput);
     void setIdOutput(int idOutput);
-
     std::string getName();
     int getLength();
     int getDiameter();
@@ -34,7 +33,6 @@ public:
     bool getInWork();
     int getIdInput();
     int getIdOutput();
-
     std::string showPipe();
     std::string showUnderRepair();
     static int getId();

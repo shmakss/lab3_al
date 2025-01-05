@@ -40,15 +40,12 @@ public:
 	void write();
 	void addPipeToMap(int csId, int pipeId);
 	void dismissElement(std::unordered_map<int, std::vector<int>>& elementMap, std::unordered_map<int, std::vector<int>>& oppositeMap, int element);
-	
 	void dismiss(Pipe& pipe,int id);
 	void dismiss(CompressorStation& cs, int id);
-
 	void dismissPipe(int pipeId);
 	void dismissCs(int csId);
 	std::unordered_map<int, std::vector<int>> mix(std::unordered_map<int, std::vector<int>> map);
 	void showMap();
-
 	void deleteBadPipesInMap();
 };
 
