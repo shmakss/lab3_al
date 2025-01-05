@@ -6,7 +6,7 @@ Pipeline::Pipeline(CheckInput& check)
 }
 
 void Pipeline::setPipeline(Pipe pipe) {
-	pipeline.insert({ Pipe::getId(), pipe});
+	pipeline.insert({ Pipe::getId(), pipe });
 }
 std::string Pipeline::showPipeline() {
 	std::string output = "рпсанопнбнд:\n";
@@ -127,16 +127,32 @@ bool Pipeline::count(int id) {
 std::vector<int> Pipeline::findDiameterForNetwork(int diameter)
 {
 	std::vector<int> ids;
-	for (auto& [id,pipe] : pipeline) {
+	for (auto& [id, pipe] : pipeline) {
 		if (!pipe.isInWork() and pipe.getDiameter() == diameter) {
 			ids.push_back(id);
 		}
 	}
 	return ids;
 }
+void Pipeline::getAJobForPipe(int id, int idInput, int idOutput)
+{
+
+	if (pipeline.count(id)) {
+		pipeline.at(id).getAJob(idInput, idOutput);
+	}
+
+}
 CheckInput& Pipeline::getCheckInput()
 {
 	return *check;
+}
+Pipe& Pipeline::findById(int id)
+{
+
+	if (pipeline.count(id)) {
+		return pipeline.at(id);
+	}
+
 }
 void Pipeline::clear() {
 	pipeline.clear();

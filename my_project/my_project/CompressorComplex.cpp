@@ -128,6 +128,12 @@ CheckInput& CompressorComplex::getCheckInput()
 {
 	return *check;
 }
+CompressorStation& CompressorComplex::findById(int id)
+{
+	if (compressorComplex.count(id)) {
+		return compressorComplex.at(id);
+	}
+}
 int CompressorComplex::size() {
 	return compressorComplex.size();
 }

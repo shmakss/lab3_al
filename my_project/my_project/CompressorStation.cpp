@@ -16,9 +16,6 @@ void CompressorStation::setWorkingWorkshops(int workingWorkshops) {
 void CompressorStation::setEffectiveness(int effectiveness) {
 	this->effectiveness = effectiveness;
 }
-void CompressorStation::setPipes(std::vector<int> pipes) {
-	this->pipes = pipes;
-}
 std::string CompressorStation::getName() {
 	return name;
 }
@@ -31,10 +28,7 @@ int CompressorStation::getWorkingWorkshops() {
 int CompressorStation::getEffectiveness() {
 	return effectiveness;
 }
-std::vector<int> CompressorStation::getPipes()
-{
-	return pipes;
-}
+//ВНИМАНИЕ!!! ПОМНИТЕ, ЧТО id принадлежит всем. Командой ниже вы не получите уникальный идентификатор
 int CompressorStation::getId() {
 	return id;
 }

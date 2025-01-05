@@ -25,24 +25,26 @@ public:
 	bool find(Pipe& pipe, std::string value);
 	bool find(Pipe& pipe, bool value);
 	template <typename T>
-	std::vector<int> findByCriteria(T value) {
-		std::vector<int> ids;
-		for (auto& [id, pipe] : pipeline) {
-			if (find(pipe, value)) {
-				ids.push_back(id);
-			}
-		}
-		return ids;
-	}
+	std::vector<int> findByCriteria(T value);
 	std::string showElement(int id);
 	void clear();
 	int size();
 	bool count(int id);
 	std::vector<int> findDiameterForNetwork(int diameter);
-	void getAJobForPipe(int id, int idInput, int idOutput) {
-		if (pipeline.count(id)) {
-			pipeline.at(id).getAJob(idInput,idOutput);
+	void getAJobForPipe(int id, int idInput, int idOutput);
+	CheckInput& getCheckInput();
+	Pipe& findById(int id);
+};
+
+template<typename T>
+inline std::vector<int> Pipeline::findByCriteria(T value)
+{
+	std::vector<int> ids;
+	for (auto& [id, pipe] : pipeline) {
+		if (find(pipe, value)) {
+			ids.push_back(id);
 		}
 	}
-	CheckInput& getCheckInput();
-};
+	return ids;
+
+}

@@ -8,7 +8,6 @@ private:
     int workshops;
     int workingWorkshops;
     int effectiveness = 0;
-    std::vector <int> pipes;
     CheckInput* check;
     friend std::istream& operator >> (std::istream& in, CompressorStation& cs);
     friend std::ostream& operator << (std::ostream& os, CompressorStation& cs);
@@ -18,12 +17,11 @@ public:
     void setWorkshops(int workshops);
     void setWorkingWorkshops(int workingWorkshops);
     void setEffectiveness(int effectiveness);
-    void setPipes(std::vector<int> pipes);
     std::string getName();
     int getWorkshops();
     int getWorkingWorkshops();
     int getEffectiveness();
-    std::vector<int> getPipes();
+    //ВНИМАНИЕ!!! ПОМНИТЕ, ЧТО id принадлежит всем. Командой ниже вы не получите уникальный идентификатор
     static int getId();
     std::string showCompressorStation();
     std::string showWorkshops();
