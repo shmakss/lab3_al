@@ -1,6 +1,18 @@
 #include "GasTransmissionNetwork.h"
 
 
+std::map<int, std::vector<int>> GasTransmissionNetwork::getCToP()
+{
+
+	return mapCsToPipes;
+
+}
+
+std::map<int, std::vector<int>> GasTransmissionNetwork::getPToC()
+{
+	return mapPipeFromOneToTwo;
+}
+
 GasTransmissionNetwork::GasTransmissionNetwork(CheckInput& check, Pipeline& pipeline, CompressorComplex& cc)
 {
 	this->check = &check;
@@ -81,7 +93,7 @@ void GasTransmissionNetwork::showGtn()
 	std::cout << *cc;
 }
 
-void GasTransmissionNetwork::editPipeline(){
+void GasTransmissionNetwork::editPipeline() {
 
 	editElements(pipeline);
 }
@@ -154,7 +166,7 @@ void GasTransmissionNetwork::addPipeToMap(int csId, int pipeId)
 	}
 }
 
-void GasTransmissionNetwork::dismissElement(std::unordered_map<int, std::vector<int>>& elementMap, std::unordered_map<int, std::vector<int>>& oppositeMap, int element)
+void GasTransmissionNetwork::dismissElement(std::map<int, std::vector<int>>& elementMap, std::map<int, std::vector<int>>& oppositeMap, int element)
 {
 	if (elementMap.count(element)) {
 		for (auto& [id, vector] : oppositeMap) {
@@ -168,7 +180,7 @@ void GasTransmissionNetwork::dismissElement(std::unordered_map<int, std::vector<
 		elementMap.erase(element);
 	}
 }
-void GasTransmissionNetwork::dismiss(Pipe& pipe,int id)
+void GasTransmissionNetwork::dismiss(Pipe& pipe, int id)
 {
 	dismissPipe(id);
 	deleteBadPipesInMap();
@@ -187,9 +199,9 @@ void GasTransmissionNetwork::dismissCs(int csId)
 	dismissElement(mapCsToPipes, mapPipeFromOneToTwo, csId);
 }
 
-std::unordered_map<int, std::vector<int>> GasTransmissionNetwork::mix(std::unordered_map<int, std::vector<int>> map)
+std::map<int, std::vector<int>> GasTransmissionNetwork::mix(std::map<int, std::vector<int>> map)
 {
-	std::unordered_map<int, std::vector<int>> mapCsToPipes;
+	std::map<int, std::vector<int>> mapCsToPipes;
 	for (auto& [idPipe, cses] : map) {
 		addPipeToMap(cses.at(0), idPipe);
 		addPipeToMap(cses.at(1), idPipe);

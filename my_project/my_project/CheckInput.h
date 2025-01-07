@@ -21,4 +21,6 @@ public:
 	int makeInputFromVector(std::string text, bool checkZero, std::vector<int> nums);
 	void changeCin();
 	void endWork();
+	bool fileIsCin();
+	void makeCinAsUsual();
 };

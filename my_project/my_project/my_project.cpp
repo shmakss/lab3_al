@@ -10,8 +10,8 @@
 #include "CompressorStation.h"
 #include "CompressorComplex.h"
 #include "GasTransmissionNetwork.h"
+#include "Graph.h"
 #pragma warning(disable : 4996)
-
 
 using namespace std;
 
@@ -42,20 +42,18 @@ public:
                     "\n8.Дополнить газотранспортную сеть" +
                     "\n9.Проиграть сценарий" +
                     "\n10.Удалить все данные" +
-                    "\n11.Show map" +
+                    "\n11.Построить матрицу" +
                     "\n0.Выход\n", false);
 
                 if (choice > 11) {
                     flag = true;
                 }
             } while (flag);
-            //Если это не обработать - возможна ошибка
-            /*if (input.getFileIsCin() and choice == 8) {
-                input.make_cin_as_usual();
+            if (check.fileIsCin() and choice == 9) {
+                check.makeCinAsUsual();
                 cout << endl << "В сценарии нельзя выбирать пункт 8" << endl;
                 continue;
-            }*/
-            //----------------------
+            }
             switch (choice)
             {
             case (1): {
@@ -100,7 +98,11 @@ public:
                 break;
             }
             case (11):{
-                gtn.showMap();
+                Graph g;
+                //g.showTable(gtn.getCToP(),gtn.getPToC());
+                map<int, vector<int>> m = { {-2,{1,2,3}},{1,{1,1,0}},{2,{0,-1,1}},{3,{-1,0,-1}} };
+                g.test(m);
+                
                 break;
             }
             case (0): {

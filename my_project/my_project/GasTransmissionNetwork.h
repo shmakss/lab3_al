@@ -1,5 +1,6 @@
 #pragma once
 #include <fstream>
+#include <map>
 #include "Pipeline.h"
 #include "CompressorComplex.h"
 #include "CheckInput.h"
@@ -12,9 +13,11 @@ private:
 	CompressorComplex* cc;
 	std::ofstream savefile;
 	std::ifstream file_to_read;
-	std::unordered_map<int, std::vector<int>> mapPipeFromOneToTwo;
-	std::unordered_map<int, std::vector<int>> mapCsToPipes;
+	std::map<int, std::vector<int>> mapPipeFromOneToTwo;
+	std::map<int, std::vector<int>> mapCsToPipes;
 public:
+	std::map<int, std::vector<int>> getCToP();
+	std::map<int, std::vector<int>> getPToC();
 	template <typename T>
 	std::vector <int> findChest(T t);
 	template <typename T>
@@ -39,12 +42,12 @@ public:
 	void save();
 	void write();
 	void addPipeToMap(int csId, int pipeId);
-	void dismissElement(std::unordered_map<int, std::vector<int>>& elementMap, std::unordered_map<int, std::vector<int>>& oppositeMap, int element);
+	void dismissElement(std::map<int, std::vector<int>>& elementMap, std::map<int, std::vector<int>>& oppositeMap, int element);
 	void dismiss(Pipe& pipe,int id);
 	void dismiss(CompressorStation& cs, int id);
 	void dismissPipe(int pipeId);
 	void dismissCs(int csId);
-	std::unordered_map<int, std::vector<int>> mix(std::unordered_map<int, std::vector<int>> map);
+	std::map<int, std::vector<int>> mix(std::map<int, std::vector<int>> map);
 	void showMap();
 	void deleteBadPipesInMap();
 };

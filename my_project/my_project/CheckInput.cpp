@@ -145,3 +145,13 @@ void CheckInput::endWork()
 	input.close_brush();
 	error.close();
 }
+
+bool CheckInput::fileIsCin()
+{
+	return input.getFileIsCin();
+}
+
+void CheckInput::makeCinAsUsual()
+{
+	input.make_cin_as_usual();
+}
