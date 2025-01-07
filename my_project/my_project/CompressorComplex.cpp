@@ -134,6 +134,10 @@ CompressorStation& CompressorComplex::findById(int id)
 		return compressorComplex.at(id);
 	}
 }
+std::string CompressorComplex::showElementName(int id)
+{
+	return compressorComplex.at(id).getName();
+}
 int CompressorComplex::size() {
 	return compressorComplex.size();
 }

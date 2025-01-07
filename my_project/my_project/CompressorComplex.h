@@ -29,6 +29,7 @@ public:
 	bool count(int id);
 	CheckInput& getCheckInput();
 	CompressorStation& findById(int id);
+	std::string showElementName(int id);
 };
 
 template<typename T>

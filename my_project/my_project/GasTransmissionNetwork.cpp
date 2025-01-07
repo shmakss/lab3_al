@@ -1,18 +1,6 @@
 #include "GasTransmissionNetwork.h"
 
 
-std::map<int, std::vector<int>> GasTransmissionNetwork::getCToP()
-{
-
-	return mapCsToPipes;
-
-}
-
-std::map<int, std::vector<int>> GasTransmissionNetwork::getPToC()
-{
-	return mapPipeFromOneToTwo;
-}
-
 GasTransmissionNetwork::GasTransmissionNetwork(CheckInput& check, Pipeline& pipeline, CompressorComplex& cc)
 {
 	this->check = &check;
@@ -247,4 +235,153 @@ void GasTransmissionNetwork::deleteBadPipesInMap()
 	for (int i : badPipesId) {
 		mapPipeFromOneToTwo.erase(i);
 	}
+}
+
+void GasTransmissionNetwork::matrixWork()
+{
+	if (mapCsToPipes.size() == 0 or mapPipeFromOneToTwo.size() == 0) {
+		std::cout << "Вы не создали газотранспортной сети\n";
+		return;
+	}
+	std::map<int, std::vector<int>> incidentMatrix = getIncidentMatrix();
+	Graph g(incidentMatrix);
+	int choise = check->getOnly01("Что именно нужно сделать?\n0 - вывести матрицу смежности\n1 - сделать топологическую сортировку\n");
+	if (!choise) {
+		std::cout << std::string("МАТРИЦА СМЕЖНОСТИ\n") +
+			"Слева по вертикали и сверху по горизонтали идентификаторы компрессорных станций,\n" +
+			"участвующих в газотранспортной сети. Если между компрессорными станциями\n" +
+			"есть труба - на пересечении соответствующих строки и столбца будет идентификатор\n" +
+			"трубы, иначе - стоять -1" << std::endl << std::endl;
+		std::cout << "Участвующие компрессорные станции\n";
+		for (auto [key,value] : mapCsToPipes) {
+			std::cout << key << ") " << showCsName(key) << std::endl;
+		}
+		std::cout << std::endl;
+		std::cout << "Участвующие трубы\n";
+		for (auto [key, value] : mapPipeFromOneToTwo) {
+			std::cout << key << ") " << showPipeName(key);
+		}
+		std::cout << std::endl << std::endl;
+		g.showTable();
+	}
+	else {
+		std::cout << "Топологическая сортровка полученного графа:\n" << g.getTopologicalSortAsString() << std::endl;
+		std::cout << "Где:\n";
+		for (auto [key, value] : mapCsToPipes) {
+			std::cout << key << " - это " << showCsName(key) << std::endl;
+		}
+	}
+}
+int GasTransmissionNetwork::findIndex(std::vector<int>& v, int val) {
+	for (int i = 0; i < v.size(); i++) {
+		if (v[i] == val) {
+			return i;
+		}
+	}
+	return -1;
+}
+std::map<int, std::vector<int>> GasTransmissionNetwork::getIncidentMatrix()
+{
+
+	std::map<int, std::vector<int>> result;
+	result.insert({ numberOfNewKeys,{} });
+
+	for (auto [key, value] : mapPipeFromOneToTwo) {
+		result.at(numberOfNewKeys).push_back(key);
+	}
+	for (auto [idCs, vectorOfPipes] : mapCsToPipes) {
+		result.insert({ idCs,{} });
+		for (int j = 0; j < mapPipeFromOneToTwo.size(); j++) {
+			result.at(idCs).push_back(0);
+		}
+	}
+	for (auto [idCs, vectorOfPipes] : mapCsToPipes) {
+		for (int idPipe : vectorOfPipes) {
+			if (mapPipeFromOneToTwo.at(idPipe).at(0) == idCs) {
+				result.at(idCs).at(findIndex(result.at(numberOfNewKeys), idPipe)) = 1;
+			}
+			else {
+				result.at(idCs).at(findIndex(result.at(numberOfNewKeys), idPipe)) = -1;
+			}
+		}
+	}
+	return result;
+}
+
+
+
+std::string GasTransmissionNetwork::getAsString(std::vector<std::vector<int>> vector)
+{
+	std::string result;
+	for (std::vector<int> a : vector) {
+		result += "{";
+		for (int b : a) {
+			result += std::to_string(b) + ",";
+		}
+		if (result.back() != '{') {
+			result.pop_back();
+		}
+		result += "}, ";
+	}
+	result.pop_back();
+	result.pop_back();
+	return result;
+}
+std::string GasTransmissionNetwork::getAsString(std::map<int, int> map)
+{
+	std::string line;
+	for (auto [id, value] : map) {
+		line += std::to_string(id) + " : " + std::to_string(value) + "\n";
+	}
+	return line;
+}
+std::string GasTransmissionNetwork::getAsString(std::vector<int> vector)
+{
+	std::string line;
+	line += "{";
+	for (int i : vector) {
+		line += std::to_string(i) + ", ";
+	}
+	line.pop_back();
+	line.pop_back();
+	line += "}";
+	return line;
+}
+std::string GasTransmissionNetwork::getAsString(std::map<std::vector<int>, int> map) {
+	std::string line;
+	for (auto [id, value] : map) {
+		line += getAsString(id) + " : " + std::to_string(value) + "\n";
+	}
+	return line;
+}
+std::string GasTransmissionNetwork::getAsString(std::map<int, std::vector<int>> map) {
+	std::string line;
+	for (auto [key, value] : map) {
+		line += std::to_string(key) + " : {";
+		for (int i : value) {
+			line += std::to_string(i) + ", ";
+		}
+		if (line.back() != '{') {
+			line.pop_back();
+			line.pop_back();
+		}
+		line += "}\n";
+	}
+	return line;
+}
+std::string GasTransmissionNetwork::showPipeName(int id)
+{
+	return pipeline->showElementName(id);
+}
+std::string GasTransmissionNetwork::showCsName(int id)
+{
+	return cc->showElementName(id);
+}
+std::string GasTransmissionNetwork::stringComposition(std::string line, int num)
+{
+	std::string newLine = "";
+	for (int i = 0; i < num; i++) {
+		newLine += line;
+	}
+	return newLine;
 }

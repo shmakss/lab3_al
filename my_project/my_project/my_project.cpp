@@ -10,7 +10,6 @@
 #include "CompressorStation.h"
 #include "CompressorComplex.h"
 #include "GasTransmissionNetwork.h"
-#include "Graph.h"
 #pragma warning(disable : 4996)
 
 using namespace std;
@@ -42,7 +41,7 @@ public:
                     "\n8.Дополнить газотранспортную сеть" +
                     "\n9.Проиграть сценарий" +
                     "\n10.Удалить все данные" +
-                    "\n11.Построить матрицу" +
+                    "\n11.Работа с матрицей" +
                     "\n0.Выход\n", false);
 
                 if (choice > 11) {
@@ -98,11 +97,7 @@ public:
                 break;
             }
             case (11):{
-                Graph g;
-                //g.showTable(gtn.getCToP(),gtn.getPToC());
-                map<int, vector<int>> m = { {-2,{1,2,3}},{1,{1,1,0}},{2,{0,-1,1}},{3,{-1,0,-1}} };
-                g.test(m);
-                
+                gtn.matrixWork();
                 break;
             }
             case (0): {

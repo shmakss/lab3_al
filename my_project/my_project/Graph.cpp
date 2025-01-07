@@ -1,10 +1,11 @@
 #include "Graph.h"
 
+//------------------------Private---------------------------------
 std::map<int, int> Graph::translate(std::map<int, std::vector<int>> incidentMatrix)
 {
 	std::vector<int> allValues;
 	for (auto [key, value] : incidentMatrix) {
-		if (key != -1) {
+		if (key != numberOfNewKeys) {
 			allValues.push_back(key);
 		}
 	}
@@ -17,6 +18,37 @@ std::map<int, int> Graph::translate(std::map<int, std::vector<int>> incidentMatr
 	}
 	return dictionary;
 }
+std::map<int, int> Graph::getDictionaryForTranslate(std::vector<std::vector<int>> badAdjeancyList) {
+	std::vector<int> allValues;
+	for (auto a : badAdjeancyList) {
+		for (int b : a) {
+			if (!bool(std::count(allValues.begin(), allValues
+				.end(), b))) {
+				allValues.push_back(b);
+			}
+		}
+	}
+	std::sort(allValues.begin(), allValues.end());
+	std::map<int, int> dictionary;
+	int counter = 0;
+	for (int i : allValues) {
+		dictionary.insert({ i,counter });
+		counter += 1;
+	}
+	return dictionary;
+}
+std::vector<std::vector<int>> Graph::translate(std::vector<std::vector<int>> matrix, std::map<int, int> dictionary)
+{
+	std::vector<std::vector<int>> newMatrix;
+	for (auto a : matrix) {
+		std::vector<int> temp;
+		for (int b : a) {
+			temp.push_back(dictionary.at(b));
+		}
+		newMatrix.push_back(temp);
+	}
+	return newMatrix;
+}
 std::vector<std::vector<int>> Graph::makeBeautifulVector(std::map<int, std::vector<int>> incidentMatrix)
 {
 	int mx = incidentMatrix.size() - 1;
@@ -28,17 +60,28 @@ std::vector<std::vector<int>> Graph::makeBeautifulVector(std::map<int, std::vect
 		}
 	}
 	std::map<int, int> dictionary = translate(incidentMatrix);
-
-	//std::map<std::vector<int>, int> revPToC = reversed(transportedIncidentMatrix);
-	/*for (auto [key, value] : revPToC) {
-		result.at(dictionary.at(key.at(0))).at(dictionary.at(key.at(1))) = value;
-	}*/
-
+	std::map<int, std::vector<int>> transportedMatrix = transportMatrix(incidentMatrix);
+	for (auto [key, value] : transportedMatrix) {
+		int line = -1;
+		int column = -1;
+		if (key != numberOfNewKeys) {
+			for (int j = 0; j < value.size(); j++) {
+				if (value.at(j) == 1) {
+					line = j;
+				}
+				else if (value.at(j) == -1) {
+					column = j;
+				}
+			}
+			line = dictionary.at(transportedMatrix.at(numberOfNewKeys).at(line));
+			column = dictionary.at(transportedMatrix.at(numberOfNewKeys).at(column));
+			result.at(line).at(column) = key;
+		}
+	}
 	return result;
 }
 std::map<int, std::vector<int>> Graph::transportMatrix(std::map<int, std::vector<int>> matrix)
 {
-	int numberOfNewKeys = -2;
 	std::vector<int> keys = matrix.at(numberOfNewKeys);
 	std::map<int, std::vector<int>> result = { {numberOfNewKeys,{}} };
 	for (auto [key, value] : matrix) {
@@ -56,7 +99,95 @@ std::map<int, std::vector<int>> Graph::transportMatrix(std::map<int, std::vector
 	}
 	return result;
 }
-void Graph::showTable(std::map<int, std::vector<int>> incidentMatrix)
+void Graph::topologicalSortForEachNode(int numberOfNodes, std::vector<std::vector<int>> adjeancyList ,std::vector<bool>& visitedList, std::stack<int>& result)
+{
+
+	visitedList[numberOfNodes] = true;
+	for (int i : adjeancyList[numberOfNodes]) {
+		if (!visitedList[i]) {
+			topologicalSortForEachNode(i, adjeancyList, visitedList, result);
+		}
+	}
+	result.push(numberOfNodes);
+}
+std::stack<int> Graph::topologicalSort(std::vector<std::vector<int>> adjeancyList, int numberOfNodes)
+{
+	std::stack<int> result;
+	std::vector<bool> visitedList(numberOfNodes, false);
+	// Вызовите рекурсивную вспомогательную функцию 
+	// для сохранения топологической сортировки, 
+	// начиная со всех вершин по очереди
+	for (int i = 0; i < numberOfNodes; i++) {
+		if (!visitedList[i]) {
+			topologicalSortForEachNode(i, adjeancyList, visitedList, result);
+		}
+	}
+	return result;
+}
+std::map<std::vector<int>, int> Graph::reversed(std::map<int, std::vector<int>> map)
+{
+	std::map<std::vector<int>, int> result;
+	for (auto [key, value] : map) {
+		result.insert({ value,key });
+	}
+	return result;
+}
+std::map<int, int> Graph::reversed(std::map<int, int> matrix) {
+	std::map<int, int> newMatrix;
+	for (auto [key, value] : matrix) {
+		newMatrix.insert({ value,key });
+	}
+	return newMatrix;
+}
+//-----------------------------------------------------------------------------------------
+
+
+//------------------------Public---------------------------------
+Graph::Graph(std::map<int, std::vector<int>> incidentMatrix) {
+	this->incidentMatrix = incidentMatrix;
+	numberOfNodes = translate(incidentMatrix).size();
+	std::map<int, std::vector<int>> transportedIncidentMatrix = transportMatrix(incidentMatrix);
+	std::vector<std::vector<int>> result;
+	for (auto [key, value] : transportedIncidentMatrix) {
+		int line = -1;
+		int column = -1;
+		if (key != numberOfNewKeys) {
+			for (int j = 0; j < value.size(); j++) {
+				if (value.at(j) == 1) {
+					line = j;
+				}
+				else if (value.at(j) == -1) {
+					column = j;
+				}
+			}
+			line = transportedIncidentMatrix.at(numberOfNewKeys).at(line);
+			column = transportedIncidentMatrix.at(numberOfNewKeys).at(column);
+
+			result.push_back({ line,column });
+
+		}
+	}
+	edges = result;
+}
+std::string Graph::getTopologicalSortAsString()
+{
+	std::vector<std::vector<int>> adjeancyList(numberOfNodes);
+	std::map<int, int> dictionary = getDictionaryForTranslate(edges);
+	std::vector<std::vector<int>> newEdges = translate(edges, dictionary);
+	for (auto i : newEdges) {
+		adjeancyList[i[0]].push_back(i[1]);
+	}
+	dictionary = reversed(dictionary);
+	std::stack<int> result = topologicalSort(adjeancyList, numberOfNodes);
+	std::string resultAsString;
+	
+	while (!result.empty()) {
+		resultAsString += std::to_string(dictionary.at(result.top())) + " ";
+		result.pop();
+	}
+	return resultAsString;
+}
+void Graph::showTable()
 {
 	std::map<int, int> map = translate(incidentMatrix);
 	int width = 5;
@@ -87,62 +218,13 @@ void Graph::showTable(std::map<int, std::vector<int>> incidentMatrix)
 		std::cout << stringComposition("-", (width + 1) * (map.size() + 1)) << std::endl;
 	}
 }
-void Graph::topologicalSortForEachNode(int numberOfNodes, std::vector<bool>& visitedList, std::stack<int>& result)
-{
-	visitedList[numberOfNodes] = true;
-	for (int i : adjeancyList[numberOfNodes]) {
-		if (!visitedList[i]) {
-			topologicalSortForEachNode(i, visitedList, result);
-		}
-	}
-	result.push(numberOfNodes);
-}
-std::stack<int> Graph::topologicalSort(int numberOfNodes)
-{
-	std::stack<int> result;
-	std::vector<bool> visitedList(numberOfNodes, false);
-
-	// Вызовите рекурсивную вспомогательную функцию 
-	// для сохранения топологической сортировки, 
-	// начиная со всех вершин по очереди
-	for (int i = 0; i < numberOfNodes; i++) {
-		if (!visitedList[i]) {
-			topologicalSortForEachNode(i, visitedList, result);
-		}
-	}
-	return result;
-}
-std::string Graph::getTopologicalSortAsString()
-{
-	std::stack<int> result = topologicalSort(numberOfNodes);
-	std::string resultAsString;
-	while (!result.empty()) {
-		resultAsString += std::to_string(result.top()) + " ";
-		result.pop();
-	}
-	return resultAsString;
-}
-
-void Graph::test(std::map<int, std::vector<int>> map)
-{
-	std::map<int, std::vector<int>> newMap = transportMatrix(map);
-	std::cout << getAsString(newMap);
-}
-
-std::map<std::vector<int>, int> Graph::reversed(std::map<int, std::vector<int>> map)
-{
-	std::map<std::vector<int>, int> result;
-	for (auto [key, value] : map) {
-		result.insert({ value,key });
-	}
-	return result;
-}
+//-----------------------------------------------------------------------------------------
 
 
 //------------------------Для работы со строками и выводом---------------------------------
 std::string Graph::getAsString(std::vector<std::vector<int>> vector)
 {
-	std::string result;
+	std::string result = "{";
 	for (std::vector<int> a : vector) {
 		result += "{";
 		for (int b : a) {
@@ -155,6 +237,7 @@ std::string Graph::getAsString(std::vector<std::vector<int>> vector)
 	}
 	result.pop_back();
 	result.pop_back();
+	result += "}";
 	return result;
 }
 std::string Graph::getAsString(std::map<int, int> map)
@@ -190,6 +273,10 @@ std::string Graph::getAsString(std::map<int, std::vector<int>> map) {
 		line += std::to_string(key) + " : {";
 		for (int i : value) {
 			line += std::to_string(i) + ", ";
+		}
+		if (line.back() != '{') {
+			line.pop_back();
+			line.pop_back();
 		}
 		line += "}\n";
 	}

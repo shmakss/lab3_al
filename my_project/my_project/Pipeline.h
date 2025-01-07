@@ -34,6 +34,7 @@ public:
 	void getAJobForPipe(int id, int idInput, int idOutput);
 	CheckInput& getCheckInput();
 	Pipe& findById(int id);
+	std::string showElementName(int id);
 };
 
 template<typename T>

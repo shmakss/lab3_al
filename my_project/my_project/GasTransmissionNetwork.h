@@ -4,6 +4,7 @@
 #include "Pipeline.h"
 #include "CompressorComplex.h"
 #include "CheckInput.h"
+#include "Graph.h";
 
 class GasTransmissionNetwork
 {
@@ -15,9 +16,10 @@ private:
 	std::ifstream file_to_read;
 	std::map<int, std::vector<int>> mapPipeFromOneToTwo;
 	std::map<int, std::vector<int>> mapCsToPipes;
+	int numberOfNewKeys = -2;
+	int findIndex(std::vector<int>& v, int val);
 public:
-	std::map<int, std::vector<int>> getCToP();
-	std::map<int, std::vector<int>> getPToC();
+	
 	template <typename T>
 	std::vector <int> findChest(T t);
 	template <typename T>
@@ -50,6 +52,17 @@ public:
 	std::map<int, std::vector<int>> mix(std::map<int, std::vector<int>> map);
 	void showMap();
 	void deleteBadPipesInMap();
+	void matrixWork();
+	std::map<int, std::vector<int>> getIncidentMatrix();
+
+	std::string getAsString(std::vector<std::vector<int>> vector);
+	std::string getAsString(std::map<int, int> map);
+	std::string getAsString(std::vector<int> vector);
+	std::string getAsString(std::map<std::vector<int>, int> map);
+	std::string stringComposition(std::string line, int num);
+	std::string getAsString(std::map<int, std::vector<int>> map);
+	std::string showPipeName(int id);
+	std::string showCsName(int id);
 };
 
 template <typename T>

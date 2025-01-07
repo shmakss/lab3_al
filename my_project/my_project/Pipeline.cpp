@@ -154,6 +154,10 @@ Pipe& Pipeline::findById(int id)
 	}
 
 }
+std::string Pipeline::showElementName(int id)
+{
+	return pipeline.at(id).getName();
+}
 void Pipeline::clear() {
 	pipeline.clear();
 }
